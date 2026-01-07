@@ -8,12 +8,12 @@ router.get('/', async (req, res) => {
   res.json(blogs)
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   try {
     const blog = await Blog.create(req.body)
-    return res.json(blog)
-  } catch(error) {
-    return res.status(400).json({ error })
+    res.status(201).json(blog)
+  } catch (error) {
+    next(error)
   }
 })
 
@@ -27,17 +27,24 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
-router.put('/:id', async (req, res) => {
-  const blog = await Blog.findByPk(req.params.id)
-  if (!blog) {
-    return res.status(404).end()
+router.put('/:id', async (req, res, next) => {
+  try {
+    const blog = await Blog.findByPk(req.params.id)
+    if (!blog) return res.status(404).end()
+
+    const likes = Number(req.body.likes)
+    if (!Number.isInteger(likes) || likes < 0) {
+      const err = new Error('likes must be a non-negative integer')
+      err.name = 'BadRequestError'
+      return next(err)
+    }
+
+    blog.likes = likes
+    await blog.save()
+    res.json(blog)
+  } catch (error) {
+    next(error)
   }
-
-  blog.likes = req.body.likes
-  await blog.save()
-
-  return res.json(blog)
 })
-
 
 module.exports = router

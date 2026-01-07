@@ -6,11 +6,12 @@ const { connectToDatabase } = require('./util/db')
 
 const notesRouter = require('./controllers/notes')
 const blogsRouter = require('./controllers/blogs')
+const errorHandler = require('./util/middleware')
 
 app.use(express.json())
-
 app.use('/api/notes', notesRouter)
 app.use('/api/blogs', blogsRouter)
+app.use(errorHandler)
 
 const start = async () => {
   await connectToDatabase()
