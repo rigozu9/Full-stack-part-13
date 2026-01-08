@@ -13,31 +13,6 @@ router.get('/', async (req, res) => {
   res.json(users)
 })
 
-const tokenExtractor = (req, res, next) => {
-  const authorization = req.get('authorization')
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    try {
-      req.decodedToken = jwt.verify(authorization.substring(7), SECRET)
-    } catch{
-      return res.status(401).json({ error: 'token invalid' })
-    }
-  }  else {
-    return res.status(401).json({ error: 'token missing' })
-  }
-  next()
-}
-
-// router.post('/', tokenExtractor, async (req, res) => {
-//   try {
-//     // const user = await User.findByPk(req.decodedToken.id)
-//     const user = await User.create(...req.body)
-//     // const note = await Note.create({...req.body, userId: user.id, date: new Date()})
-//     res.json(user)
-//   } catch(error) {
-//     return res.status(400).json({ error })
-//   }
-// })
-
 router.post('/', async (req, res, next) => {
   try {
     const user = await User.create(req.body)
