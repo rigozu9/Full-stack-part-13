@@ -7,6 +7,17 @@ const noteFinder = async (req, res, next) => {
   next()
 }
 
+router.get('/', async (req, res) => {
+  const notes = await Note.findAll({
+    attributes: { exclude: ['userId'] },
+    include: {
+      model: User,
+      attributes: ['name']
+    }
+  })
+  res.json(notes)
+})
+
 router.get('/:id', noteFinder, async (req, res) => {
   if (req.note) {
     res.json(req.note)
