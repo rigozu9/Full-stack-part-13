@@ -3,8 +3,11 @@ const { SECRET } = require('./config.js')
 
 const errorHandler = (error, req, res, next) => {
   console.error(error.name, error.message)
+  if (error.name === 'SequelizeValidationError') {
+    const messages = error.errors?.map(e => e.message) ?? [error.message]
+    return res.status(400).json({ error: messages.join(', ') })
+  }
   if (
-    error.name === 'SequelizeValidationError' ||
     error.name === 'SequelizeUniqueConstraintError'
   ) {
     return res.status(400).json({ error: 'bad request' })
