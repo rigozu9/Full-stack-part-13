@@ -2,6 +2,8 @@ const router = require('express').Router()
 
 const { User, Blog } = require('../models')
 
+const { tokenExtractor } = require('../util/middleware')
+
 const userFinder = async (req, res, next) => {
   req.user = await User.findOne({
     where: { username: req.params.username }
@@ -38,11 +40,35 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-router.put('/:username', userFinder, async (req, res) => {
-  if (req.user) {
-    req.user.username = req.body.username
-    await req.user.save()
-    res.json(req.user)
+// router.put('/:username', userFinder, async (req, res) => {
+//   if (req.user) {
+//     req.user.username = req.body.username
+//     await req.user.save()
+//     res.json(req.user)
+//   } else {
+//     res.status(404).end()
+//   }
+// })
+
+const isAdmin = async (req, res, next) => {
+  const user = await User.findByPk(req.decodedToken.id)
+  if (!user.admin) {
+    return res.status(401).json({ error: 'operation not allowed' })
+  }
+  next()
+}
+
+router.put('/:username', tokenExtractor, isAdmin, async (req, res) => {
+  const user = await User.findOne({
+    where: {
+      username: req.params.username
+    }
+  })
+
+  if (user) {
+    user.disabled = req.body.disabled
+    await user.save()
+    res.json(user)
   } else {
     res.status(404).end()
   }
