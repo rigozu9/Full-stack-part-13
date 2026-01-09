@@ -39,6 +39,18 @@ router.post('/', async (req, res, next) => {
 
 
 router.get('/:id', async (req, res) => {
+  const readParam = req.query.read
+
+  const readOrNo = {
+    attributes: ['id', 'read'],
+  }
+
+  if (readParam === 'true') {
+    readOrNo.where = { read: true }
+  } else if (readParam === 'false') {
+    readOrNo.where = { read: false }
+  }
+
   const user = await User.findByPk(req.params.id, {
     attributes: { exclude: ['id', 'admin', 'disabled', 'createdAt', 'updatedAt'] } ,
     include:[{
@@ -68,9 +80,7 @@ router.get('/:id', async (req, res) => {
         model: Blog,
         as: 'reading_blogs',
         attributes: ['id', 'url', 'title', 'author', 'likes', 'year'],
-        through: { 
-          attributes: ['id', 'read'] 
-        }
+        through: readOrNo
       }
     ]
   })
