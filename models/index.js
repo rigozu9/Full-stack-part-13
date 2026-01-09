@@ -5,9 +5,11 @@ const Team = require('./team')
 const Membership = require('./membership')
 const UserNotes = require('./user_notes')
 const ReadingList = require('./reading_list')
+const Session = require('./session')
 
 User.hasMany(Note)
 User.hasMany(Blog)
+User.hasMany(Session)
 
 Blog.belongsTo(User)
 Note.belongsTo(User)
@@ -27,6 +29,8 @@ ReadingList.belongsTo(User)
 Blog.hasMany(ReadingList)
 ReadingList.belongsTo(Blog)
 
+Session.belongsTo(User)
+
 module.exports = {
   Note,
   Blog,
@@ -34,5 +38,6 @@ module.exports = {
   Team,
   Membership,
   UserNotes,
-  ReadingList
+  ReadingList,
+  Session
 }
