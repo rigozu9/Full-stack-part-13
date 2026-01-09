@@ -21,6 +21,12 @@ Note.belongsToMany(User, { through: UserNotes, as: 'users_marked' })
 User.belongsToMany(Blog, { through: ReadingList, as: 'reading_blogs' })
 Blog.belongsToMany(User, { through: ReadingList, as: 'readers' })
 
+User.hasMany(ReadingList)
+ReadingList.belongsTo(User)
+
+Blog.hasMany(ReadingList)
+ReadingList.belongsTo(Blog)
+
 module.exports = {
   Note,
   Blog,
